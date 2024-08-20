@@ -168,12 +168,12 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "api_log_policy_attachment" {
-  policy_arn = aws_iam_policy.api_user_aux4_io_log_policy.arn
+  policy_arn = aws_iam_policy.api_log_policy.arn
   role       = aws_iam_role.api_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "api_invoke_lambda_policy_attachment" {
-  policy_arn = aws_iam_policy.api_user_aux4_io_invoke_lambda_policy.arn
+  policy_arn = aws_iam_policy.api_invoke_lambda_policy.arn
   role       = aws_iam_role.api_role.name
 }
 
