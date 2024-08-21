@@ -9,41 +9,6 @@ terraform {
 
 locals {
   api_name = "${var.env}-${var.api_name}"
-
-  cors = jsonencode({
-    responses = {
-      "200" = {
-        description = "200 response"
-        headers = {
-          "Access-Control-Allow-Origin" = {
-            type = "string"
-          },
-          "Access-Control-Allow-Methods" = {
-            type = "string"
-          },
-          "Access-Control-Allow-Headers" = {
-            type = "string"
-          }
-        }
-      }
-    },
-    x-amazon-apigateway-integration = {
-      type = "mock"
-      requestTemplates = {
-        "application/json" = "{\"statusCode\": 200}"
-      }
-      responses = {
-        "default" = {
-          statusCode = "200"
-          responseParameters = {
-            "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-            "method.response.header.Access-Control-Allow-Methods" = "'[METHODS]'"
-            "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          }
-        }
-      }
-    }
-  })
 }
 
 module "lambda_auhtorizer" {
@@ -67,16 +32,16 @@ module "lambda_path" {
   source = "./modules/lambda"
 
   for_each = toset(flatten([for path, methods in var.api_paths : [for method, config in methods : {
-    path   = path
-    method = method
-    function_file = config.lambda.file
-    function_zip  = config.lambda.zip
-    function_runtime = config.lambda.runtime
-    function_memory_size = config.lambda.memory_size
-    function_timeout = config.lambda.timeout
+    path                           = path
+    method                         = method
+    function_file                  = config.lambda.file
+    function_zip                   = config.lambda.zip
+    function_runtime               = config.lambda.runtime
+    function_memory_size           = config.lambda.memory_size
+    function_timeout               = config.lambda.timeout
     function_environment_variables = config.lambda.environment_variables
-    function_policies = config.lambda.policies
-    function_log_retention = config.lambda.log_retention
+    function_policies              = config.lambda.policies
+    function_log_retention         = config.lambda.log_retention
   }]]))
 
   env                            = var.env
@@ -229,9 +194,41 @@ resource "aws_api_gateway_rest_api" "api" {
           }
         },
         {
-          options = jsondecode(replace(local.cors, "[METHODS]", join(",", distinct(flatten([for method, config in methods : method])))))
-        }
-      )
+          options = {
+            responses = {
+              "200" = {
+                description = "200 response"
+                headers = {
+                  "Access-Control-Allow-Origin" = {
+                    type = "string"
+                  },
+                  "Access-Control-Allow-Methods" = {
+                    type = "string"
+                  },
+                  "Access-Control-Allow-Headers" = {
+                    type = "string"
+                  }
+                }
+              }
+            },
+            x-amazon-apigateway-integration = {
+              type = "mock"
+              requestTemplates = {
+                "application/json" = "{\"statusCode\": 200}"
+              }
+              responses = {
+                "default" = {
+                  statusCode = "200"
+                  responseParameters = {
+                    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+                    "method.response.header.Access-Control-Allow-Methods" = join(",", distinct(flatten([for method, config in methods : method])))
+                    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                  }
+                }
+              }
+            }
+          }
+      })
     }
   })
 }
@@ -246,7 +243,7 @@ resource "aws_api_gateway_gateway_response" "api_default_4xx" {
 }
 
 resource "aws_api_gateway_gateway_response" "api_default_5xx" {
-  rest_api_id   = aws_api_gateway_rest_api.api_user_aux4_io.id
+  rest_api_id   = aws_api_gateway_rest_api.api.id
   response_type = "DEFAULT_5XX"
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
