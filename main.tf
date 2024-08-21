@@ -135,7 +135,7 @@ resource "aws_iam_policy" "api_invoke_lambda_policy" {
       "Effect": "Allow",
       "Action": "lambda:InvokeFunction",
       "Resource": [
-        "${aws_lambda_function.api_user_aux4_io_authorizer_lambda.arn}"
+        "${aws_lambda_function.api_authorizer_lambda.arn}"
       ]
     }
   ]
