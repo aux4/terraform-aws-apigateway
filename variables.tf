@@ -33,7 +33,7 @@ variable "api_authorizers" {
       runtime               = optional(string)
       memory_size           = optional(number)
       timeout               = optional(number)
-      environment_variables = (map(string))
+      environment_variables = optional(map(string))
       policies              = optional(list(string))
       log_retention         = optional(number)
     })
