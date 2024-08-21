@@ -67,16 +67,16 @@ module "lambda_path" {
   source = "../lambda"
 
   for_each = toset(flatten([for path, methods in var.api_paths : [for method, config in methods : {
-    path   = path
-    method = method
-    function_file = config.lambda.file
-    function_zip  = config.lambda.zip
-    function_runtime = config.lambda.runtime
-    function_memory_size = config.lambda.memory_size
-    function_timeout = config.lambda.timeout
+    path                           = path
+    method                         = method
+    function_file                  = config.lambda.file
+    function_zip                   = config.lambda.zip
+    function_runtime               = config.lambda.runtime
+    function_memory_size           = config.lambda.memory_size
+    function_timeout               = config.lambda.timeout
     function_environment_variables = config.lambda.environment_variables
-    function_policies = config.lambda.policies
-    function_log_retention = config.lambda.log_retention
+    function_policies              = config.lambda.policies
+    function_log_retention         = config.lambda.log_retention
   }]]))
 
   env                            = var.env
@@ -220,6 +220,7 @@ resource "aws_api_gateway_rest_api" "api" {
                 description = "200 response"
               }
             }
+            security = []
             x-amazon-apigateway-integration = {
               httpMethod  = "POST"
               type        = "aws_proxy"
