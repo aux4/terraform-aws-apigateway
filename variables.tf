@@ -28,16 +28,16 @@ variable "api_authorizers" {
   description = "The authorizers for the API Gateway"
   type        = map(map(object({
     lambda = object({
-      zip                   = string
+      zip                   = optional(string)
       file                  = string
-      runtime               = string
-      memory_size           = number
-      timeout               = number
-      environment_variables = map(string)
-      policies              = list(string)
-      log_retention         = number
+      runtime               = optional(string)
+      memory_size           = optional(number)
+      timeout               = optional(number)
+      environment_variables = (map(string))
+      policies              = optional(list(string))
+      log_retention         = optional(number)
     })
-    authorizer_result_ttl_in_seconds = number
+    authorizer_result_ttl_in_seconds = optional(number)
   })))
 }
 
@@ -46,14 +46,14 @@ variable "api_paths" {
   type = map(map(object({
     security = list(string)
     lambda = object({
-      zip                   = string
+      zip                   = optional(string)
       file                  = string
-      runtime               = string
-      memory_size           = number
-      timeout               = number
-      environment_variables = map(string)
-      policies              = list(string)
-      log_retention         = number
+      runtime               = optional(string)
+      memory_size           = optional(number)
+      timeout               = optional(number)
+      environment_variables = optional(map(string))
+      policies              = optional(list(string))
+      log_retention         = optional(number)
     })
   })))
 }
