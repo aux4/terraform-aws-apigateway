@@ -45,7 +45,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 resource "aws_lambda_function" "lambda" {
   function_name = local.function_name
   handler       = "src/function/${var.function_file}.handler"
-  role          = aws_iam_role.my_lambda_role.arn
+  role          = aws_iam_role.lambda_role.arn
 
   runtime     = var.function_runtime
   memory_size = var.function_memory_size
