@@ -9,41 +9,6 @@ terraform {
 
 locals {
   api_name = "${var.env}-${var.api_name}"
-
-  cors = jsonencode({
-    responses = {
-      "200" = {
-        description = "200 response"
-        headers = {
-          "Access-Control-Allow-Origin" = {
-            type = "string"
-          },
-          "Access-Control-Allow-Methods" = {
-            type = "string"
-          },
-          "Access-Control-Allow-Headers" = {
-            type = "string"
-          }
-        }
-      }
-    },
-    x-amazon-apigateway-integration = {
-      type = "mock"
-      requestTemplates = {
-        "application/json" = "{\"statusCode\": 200}"
-      }
-      responses = {
-        "default" = {
-          statusCode = "200"
-          responseParameters = {
-            "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-            "method.response.header.Access-Control-Allow-Methods" = "'[METHODS]'"
-            "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          }
-        }
-      }
-    }
-  })
 }
 
 module "lambda_auhtorizer" {
@@ -135,7 +100,7 @@ resource "aws_iam_policy" "api_invoke_lambda_policy" {
       "Effect": "Allow",
       "Action": "lambda:InvokeFunction",
       "Resource": [
-        "${aws_lambda_function.api_user_aux4_io_authorizer_lambda.arn}"
+        "*"
       ]
     }
   ]
@@ -220,7 +185,12 @@ resource "aws_api_gateway_rest_api" "api" {
                 description = "200 response"
               }
             }
-            security = []
+            security = [
+              {
+                aux4_authorizer = []
+              }
+            ]
+
             x-amazon-apigateway-integration = {
               httpMethod  = "POST"
               type        = "aws_proxy"
@@ -230,7 +200,40 @@ resource "aws_api_gateway_rest_api" "api" {
           }
         },
         {
-          options = jsondecode(replace(local.cors, "[METHODS]", join(",", distinct(flatten([for method, config in methods : method])))))
+          options = {
+            responses = {
+              "200" = {
+                description = "200 response"
+                headers = {
+                  "Access-Control-Allow-Origin" = {
+                    type = "string"
+                  },
+                  "Access-Control-Allow-Methods" = {
+                    type = "string"
+                  },
+                  "Access-Control-Allow-Headers" = {
+                    type = "string"
+                  }
+                }
+              }
+            },
+            x-amazon-apigateway-integration = {
+              type = "mock"
+              requestTemplates = {
+                "application/json" = "{\"statusCode\": 200}"
+              }
+              responses = {
+                "default" = {
+                  statusCode = "200"
+                  responseParameters = {
+                    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+                    "method.response.header.Access-Control-Allow-Methods" = join(",", distinct(flatten([for method, config in methods : method])))
+                    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                  }
+                }
+              }
+            }
+          }
         }
       )
     }
