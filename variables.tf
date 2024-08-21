@@ -44,7 +44,7 @@ variable "api_authorizers" {
 variable "api_paths" {
   description = "The paths for the API Gateway"
   type = map(map(object({
-    security = list(string)
+    security = optional(list(string))
     lambda = object({
       zip                   = optional(string)
       file                  = string
