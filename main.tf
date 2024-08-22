@@ -11,28 +11,6 @@ locals {
   api_name = "${var.env}-${var.api_name}"
 }
 
-resource "null_resource" "lambda" {
-  triggers = {
-    functions = flatten([
-      for authorizer_key, authorizer in var.api_authorizers : [
-        for path, methods in var.api_paths : [
-          for method, config in methods : {
-            function_name                  = "${local.api_name}-${path}-${method}"
-            function_file                  = config.lambda.file
-            function_zip                   = config.lambda.zip
-            function_runtime               = config.lambda.runtime
-            function_memory_size           = config.lambda.memory_size
-            function_timeout               = config.lambda.timeout
-            function_environment_variables = config.lambda.environment_variables
-            function_policies              = config.lambda.policies
-            function_log_retention         = config.lambda.log_retention
-          }
-        ]
-      ]
-    ])
-  }
-}
-
 module "lambda_authorizer" {
   source = "./modules/lambda"
 
@@ -53,18 +31,22 @@ module "lambda_authorizer" {
 module "lambda_path" {
   source = "./modules/lambda"
 
-  for_each = null_resource.lambda.triggers.functions
+  for_each = flatten([for path, methods in var.api_paths : [for method, config in methods : {
+    path   = path
+    method = method
+    config = config.lambda
+  }]])
 
   env                            = var.env
-  function_file                  = each.value.function_file
-  function_zip                   = each.value.function_zip
+  function_file                  = each.value.config.file 
+  function_zip                   = each.value.config.zip
   function_prefix                = var.api_prefix
-  function_runtime               = each.value.function_runtime
-  function_memory_size           = each.value.function_memory_size
-  function_timeout               = each.value.function_timeout
-  function_environment_variables = each.value.function_environment_variables
-  function_policies              = each.value.function_policies
-  function_log_retention         = each.value.function_log_retention
+  function_runtime               = each.value.config.runtime
+  function_memory_size           = each.value.config.memory_size
+  function_timeout               = each.value.config.timeout
+  function_environment_variables = each.value.config.environment_variables
+  function_policies              = each.value.config.policies
+  function_log_retention         = each.value.config.log_retention
 }
 
 resource "aws_lambda_permission" "api_lambda_execution_permission" {
