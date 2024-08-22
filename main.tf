@@ -166,7 +166,7 @@ resource "aws_api_gateway_rest_api" "api" {
       version = "1.0"
     },
     securityDefinitions = {
-      for auth in var.api_authorizers : auth.key => {
+      for auth_name, auth in var.api_authorizers : auth_name => {
         type                         = "apiKey"
         name                         = "Authorization"
         in                           = "header"
@@ -176,7 +176,7 @@ resource "aws_api_gateway_rest_api" "api" {
           identitySource               = "method.request.header.Authorization"
           identityValidationExpression = "Bearer [^\\s]+"
           authorizerCredentials        = aws_iam_role.api_role.arn
-          authorizerUri                = module.lambda_authorizer[auth.key].invoke_arn
+          authorizerUri                = module.lambda_authorizer[auth_name].function_invoke_arn
           authorizerResultTtlInSeconds = auth.value.authorizer_result_ttl_in_seconds
         }
       }
