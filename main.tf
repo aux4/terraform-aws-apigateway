@@ -177,7 +177,7 @@ resource "aws_api_gateway_rest_api" "api" {
           identityValidationExpression = "Bearer [^\\s]+"
           authorizerCredentials        = aws_iam_role.api_role.arn
           authorizerUri                = module.lambda_authorizer[auth_name].function_invoke_arn
-          authorizerResultTtlInSeconds = auth.value.authorizer_result_ttl_in_seconds
+          authorizerResultTtlInSeconds = auth.authorizer_result_ttl_in_seconds
         }
       }
     },
