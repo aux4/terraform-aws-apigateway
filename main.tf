@@ -40,7 +40,7 @@ module "lambda_path" {
           config = config.lambda
         }
       ]
-    ]) : "${lambda.path}_${lambda.method}_${idx}" => lambda
+    ]) : "${lambda.path}_${lambda.method}" => lambda
   }
 
   env                            = var.env
@@ -56,14 +56,21 @@ module "lambda_path" {
 }
 
 resource "aws_lambda_permission" "api_lambda_execution_permission" {
-  for_each = toset(flatten([for path, methods in var.api_paths : [for method, config in methods : {
-    path   = path
-    method = method
-  }]]))
+  for_each = {
+    for idx, lambda in flatten([
+      for path, methods in var.api_paths : [
+        for method, config in methods : {
+          path   = path
+          method = method
+          config = config.lambda
+        }
+      ]
+    ]) : "${lambda.path}_${lambda.method}" => lambda
+  }
 
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = module.lambda_path[each.value.path].function_name
+  function_name = module.lambda_path[each.key].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${upper(each.value.method)}/${each.value.path}"
 }
@@ -187,7 +194,7 @@ resource "aws_api_gateway_rest_api" "api" {
             x-amazon-apigateway-integration = {
               httpMethod  = "POST"
               type        = "aws_proxy"
-              uri         = module.lambda_path[path].invoke_arn
+              uri         = module.lambda_path["${path}_${method}"].invoke_arn
               credentials = aws_iam_role.api_role.arn
             }
           }
