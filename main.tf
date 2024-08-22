@@ -12,23 +12,25 @@ locals {
 }
 
 resource "null_resource" "lambda" {
-  functions = flatten([
-    for authorizer_key, authorizer in var.api_authorizers : [
-      for path, methods in var.api_paths : [
-        for method, config in methods : {
-          function_name = "${local.api_name}-${path}-${method}"
-          function_file = config.lambda.file
-          function_zip  = config.lambda.zip
-          function_runtime = config.lambda.runtime
-          function_memory_size = config.lambda.memory_size
-          function_timeout = config.lambda.timeout
-          function_environment_variables = config.lambda.environment_variables
-          function_policies = config.lambda.policies
-          function_log_retention = config.lambda.log_retention
-        }
+  triggers = {
+    functions = flatten([
+      for authorizer_key, authorizer in var.api_authorizers : [
+        for path, methods in var.api_paths : [
+          for method, config in methods : {
+            function_name                  = "${local.api_name}-${path}-${method}"
+            function_file                  = config.lambda.file
+            function_zip                   = config.lambda.zip
+            function_runtime               = config.lambda.runtime
+            function_memory_size           = config.lambda.memory_size
+            function_timeout               = config.lambda.timeout
+            function_environment_variables = config.lambda.environment_variables
+            function_policies              = config.lambda.policies
+            function_log_retention         = config.lambda.log_retention
+          }
+        ]
       ]
-    ]
-  ])
+    ])
+  }
 }
 
 module "lambda_authorizer" {
@@ -51,7 +53,7 @@ module "lambda_authorizer" {
 module "lambda_path" {
   source = "./modules/lambda"
 
-  for_each = null_resource.lambda.functions
+  for_each = null_resource.lambda.triggers.functions
 
   env                            = var.env
   function_file                  = each.value.function_file
