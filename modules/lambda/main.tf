@@ -55,8 +55,8 @@ resource "aws_lambda_function" "lambda" {
   filename         = var.function_zip
 
   logging_config {
-    log_group_name = aws_cloudwatch_log_group.lambda_log_group.name
-    log_stream_name = "{request_id}"
+    log_format = "json"
+    log_group = aws_cloudwatch_log_group.lambda_log_group.name
   }
 
   environment {
