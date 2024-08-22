@@ -8,7 +8,7 @@ terraform {
 }
 
 locals {
-  function_name = "${var.env}-${var.function_prefix}-${lower(var.function_file)}"
+  function_name = replace("${var.env}-${var.function_prefix}-${lower(var.function_file)}", "--", "-")
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -55,7 +55,7 @@ resource "aws_lambda_function" "lambda" {
   filename         = var.function_zip
 
   logging_config {
-    log_format = "json"
+    log_format = "JSON"
     log_group = aws_cloudwatch_log_group.lambda_log_group.name
   }
 
