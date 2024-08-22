@@ -26,7 +26,7 @@ variable "api_description" {
 
 variable "api_authorizers" {
   description = "The authorizers for the API Gateway"
-  type        = map(map(object({
+  type        = map(object({
     lambda = object({
       zip                   = optional(string)
       file                  = string
@@ -38,7 +38,7 @@ variable "api_authorizers" {
       log_retention         = optional(number)
     })
     authorizer_result_ttl_in_seconds = optional(number)
-  })))
+  }))
 }
 
 variable "api_paths" {
