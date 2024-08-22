@@ -22,6 +22,7 @@ variable "api_description" {
   description = "The description of the API Gateway"
   type        = string
   default     = ""
+  nullable    = false
 }
 
 variable "api_authorizers" {
