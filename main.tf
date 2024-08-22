@@ -11,7 +11,7 @@ locals {
   api_name = "${var.env}-${var.api_name}"
 }
 
-module "lambda_auhtorizer" {
+module "lambda_authorizer" {
   source = "./modules/lambda"
 
   for_each = var.api_authorizers
