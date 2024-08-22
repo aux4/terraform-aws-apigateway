@@ -194,7 +194,7 @@ resource "aws_api_gateway_rest_api" "api" {
             x-amazon-apigateway-integration = {
               httpMethod  = "POST"
               type        = "aws_proxy"
-              uri         = module.lambda_path["${path}_${method}"].invoke_arn
+              uri         = module.lambda_path["${path}_${method}"].function_invoke_arn
               credentials = aws_iam_role.api_role.arn
             }
           }
