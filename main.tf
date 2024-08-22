@@ -31,14 +31,20 @@ module "lambda_authorizer" {
 module "lambda_path" {
   source = "./modules/lambda"
 
-  for_each = flatten([for path, methods in var.api_paths : [for method, config in methods : {
-    path   = path
-    method = method
-    config = config.lambda
-  }]])
+  for_each = {
+    for idx, lambda in flatten([
+      for path, methods in var.api_paths : [
+        for method, config in methods : {
+          path   = path
+          method = method
+          config = config.lambda
+        }
+      ]
+    ]) : "${lambda.path}_${lambda.method}_${idx}" => lambda
+  }
 
   env                            = var.env
-  function_file                  = each.value.config.file 
+  function_file                  = each.value.config.file
   function_zip                   = each.value.config.zip
   function_prefix                = var.api_prefix
   function_runtime               = each.value.config.runtime
