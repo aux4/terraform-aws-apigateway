@@ -19,7 +19,7 @@ module "lambda_authorizer" {
   env                            = var.env
   function_file                  = each.value.lambda.file
   function_zip                   = each.value.lambda.zip
-  function_prefix                = local.api_name
+  function_prefix                = var.api_prefix
   function_runtime               = each.value.lambda.runtime
   function_memory_size           = each.value.lambda.memory_size
   function_timeout               = each.value.lambda.timeout
@@ -47,7 +47,7 @@ module "lambda_path" {
   env                            = var.env
   function_file                  = each.value.function_file
   function_zip                   = each.value.function_zip
-  function_prefix                = local.api_name
+  function_prefix                = var.api_prefix
   function_runtime               = each.value.function_runtime
   function_memory_size           = each.value.function_memory_size
   function_timeout               = each.value.function_timeout

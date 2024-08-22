@@ -8,7 +8,7 @@ terraform {
 }
 
 locals {
-  function_name = replace("${var.env}-${var.function_prefix}-${lower(var.function_file)}", "--", "-")
+  function_name = replace("${var.env}-${lower(var.function_prefix)}-${lower(var.function_file)}", "--", "-")
 }
 
 resource "aws_iam_role" "lambda_role" {
