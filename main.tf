@@ -192,8 +192,8 @@ resource "aws_api_gateway_rest_api" "api" {
               }
             }
             security = [
-              for auth in config.security : {
-                "${auth.name}" = []
+              for auth_name in config.security : {
+                "${auth_name}" = []
               }
             ]
             x-amazon-apigateway-integration = {
