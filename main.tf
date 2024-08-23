@@ -192,7 +192,7 @@ resource "aws_api_gateway_rest_api" "api" {
               }
             }
             security = [
-              for auth_name in config.security : {
+              for auth_name in coalesce(config.security, []) : {
                 "${auth_name}" = []
               }
             ]
