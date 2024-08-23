@@ -191,6 +191,11 @@ resource "aws_api_gateway_rest_api" "api" {
                 description = "200 response"
               }
             }
+            security = [
+              for auth in config.security : {
+                "${auth.name}" = []
+              }
+            ]
             x-amazon-apigateway-integration = {
               httpMethod  = "POST"
               type        = "aws_proxy"
