@@ -72,7 +72,7 @@ resource "aws_lambda_permission" "api_lambda_execution_permission" {
   action        = "lambda:InvokeFunction"
   function_name = module.lambda_path[each.key].function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${upper(each.value.method)}/${each.value.path}"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${upper(each.value.method)}${each.value.path}"
 }
 
 resource "aws_iam_role" "api_role" {
