@@ -232,7 +232,7 @@ resource "aws_api_gateway_rest_api" "api" {
                   statusCode = "200"
                   responseParameters = {
                     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-                    "method.response.header.Access-Control-Allow-Methods" = "'${join(",", concat(["options"], distinct(flatten([for method, config in methods : method]))))}'"
+                    "method.response.header.Access-Control-Allow-Methods" = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
                     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                   }
                 }
