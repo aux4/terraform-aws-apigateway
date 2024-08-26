@@ -249,7 +249,7 @@ resource "aws_api_gateway_gateway_response" "api_default_4xx" {
   response_type = "DEFAULT_4XX"
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
   }
 }
 
@@ -258,7 +258,7 @@ resource "aws_api_gateway_gateway_response" "api_default_5xx" {
   response_type = "DEFAULT_5XX"
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
   }
 }
 
