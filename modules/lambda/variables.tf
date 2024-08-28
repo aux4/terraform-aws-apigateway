@@ -40,7 +40,7 @@ variable "function_file" {
 variable "function_zip" {
   description = "The zip file of the Lambda function"
   type        = string
-  default     = "../dist/lambda-function.zip"
+  default     = "../dist/api.zip"
   nullable    = false
 }
 
