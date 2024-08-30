@@ -36,6 +36,7 @@ variable "api_authorizers" {
   description = "The authorizers for the API Gateway"
   type        = map(object({
     lambda = object({
+      arn                   = optional(string)
       zip                   = optional(string)
       file                  = string
       runtime               = optional(string)

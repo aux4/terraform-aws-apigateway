@@ -14,7 +14,7 @@ locals {
 module "lambda_authorizer" {
   source = "./modules/lambda"
 
-  for_each = var.api_authorizers
+  for_each = { for key, value in var.api_authorizers : key => value if value.lambda.arn == null }
 
   env                            = var.env
   function_file                  = each.value.lambda.file
@@ -176,7 +176,7 @@ resource "aws_api_gateway_rest_api" "api" {
           identitySource               = "method.request.header.Authorization"
           identityValidationExpression = "Bearer [^\\s]+"
           authorizerCredentials        = aws_iam_role.api_role.arn
-          authorizerUri                = module.lambda_authorizer[auth_name].function_invoke_arn
+          authorizerUri                = auth.lambda.arn != null ? auth.lambda.arn : module.lambda_authorizer[auth_name].function_invoke_arn
           authorizerResultTtlInSeconds = auth.authorizer_result_ttl_in_seconds
         }
       }
