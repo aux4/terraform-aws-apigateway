@@ -38,7 +38,7 @@ variable "api_authorizers" {
     lambda = object({
       arn                   = optional(string)
       zip                   = optional(string)
-      file                  = string
+      file                  = optional(string)
       runtime               = optional(string)
       memory_size           = optional(number)
       timeout               = optional(number)
