@@ -12,7 +12,7 @@ locals {
 }
 
 module "lambda_authorizer" {
-  source = "./modules/lambda"
+  source = "git@github.com:aux4/terraform-aws-lambda.git?ref=v1"
 
   for_each = { for key, value in var.api_authorizers : key => value if value.lambda.arn == null }
 
@@ -29,7 +29,7 @@ module "lambda_authorizer" {
 }
 
 module "lambda_path" {
-  source = "./modules/lambda"
+  source = "git@github.com:aux4/terraform-aws-lambda.git?ref=v1"
 
   for_each = {
     for idx, lambda in flatten([
