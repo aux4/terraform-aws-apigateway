@@ -210,6 +210,9 @@ resource "aws_api_gateway_rest_api" "api" {
               "200" = {
                 description = "200 response"
                 headers = {
+                  "Access-Control-Allow-Credentials" = {
+                    type = "string"
+                  },
                   "Access-Control-Allow-Origin" = {
                     type = "string"
                   },
@@ -231,9 +234,10 @@ resource "aws_api_gateway_rest_api" "api" {
                 "default" = {
                   statusCode = "200"
                   responseParameters = {
-                    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-                    "method.response.header.Access-Control-Allow-Methods" = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
-                    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Credentials,Cookie'"
+                    "method.response.header.Access-Control-Allow-Origin"      = "'*'"
+                    "method.response.header.Access-Control-Allow-Methods"     = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
+                    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Credentials,Cookie'"
+                    "method.response.header.Access-Control-Allow-Credentials" = "'true'"
                   }
                 }
               }
