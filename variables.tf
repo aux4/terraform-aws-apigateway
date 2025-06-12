@@ -81,3 +81,9 @@ variable "api_binary_media_types" {
   ]
 }
 
+variable "api_cors_allowed_origins" {
+  description = "List of allowed origins for CORS. If not provided, defaults to '*'"
+  type        = list(string)
+  default     = ["*"]
+}
+

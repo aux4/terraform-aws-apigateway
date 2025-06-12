@@ -228,16 +228,36 @@ resource "aws_api_gateway_rest_api" "api" {
             x-amazon-apigateway-integration = {
               type = "mock"
               requestTemplates = {
-                "application/json" = "{\"statusCode\": 200}"
+                "application/json" = jsonencode({
+                  statusCode     = 200
+                  allowedOrigins = var.api_cors_allowed_origins
+                })
               }
               responses = {
                 "default" = {
                   statusCode = "200"
                   responseParameters = {
-                    "method.response.header.Access-Control-Allow-Origin"      = "'*'"
+                    "method.response.header.Access-Control-Allow-Origin"      = length(var.api_cors_allowed_origins) == 1 && var.api_cors_allowed_origins[0] == "*" ? "'*'" : "integration.response.body.allowedOrigin"
                     "method.response.header.Access-Control-Allow-Methods"     = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
                     "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Credentials,Cookie'"
                     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
+                  }
+                  responseTemplates = {
+                    "application/json" = <<-EOT
+                      #set($origin = $input.params("Origin"))
+                      #set($allowedOrigins = $input.json("$.allowedOrigins"))
+                      #set($allowedOrigin = "")
+                      #foreach($allowed in $allowedOrigins)
+                        #if($origin == $allowed)
+                          #set($allowedOrigin = $origin)
+                          #break
+                        #end
+                      #end
+                      #if($allowedOrigin == "")
+                        #set($allowedOrigin = "null")
+                      #end
+                      {"allowedOrigin": "$allowedOrigin"}
+                    EOT
                   }
                 }
               }
@@ -252,7 +272,7 @@ resource "aws_api_gateway_gateway_response" "api_default_4xx" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   response_type = "DEFAULT_4XX"
   response_parameters = {
-    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = length(var.api_cors_allowed_origins) == 1 && var.api_cors_allowed_origins[0] == "*" ? "'*'" : "method.request.header.Origin"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
   }
 }
@@ -261,7 +281,7 @@ resource "aws_api_gateway_gateway_response" "api_default_5xx" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   response_type = "DEFAULT_5XX"
   response_parameters = {
-    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = length(var.api_cors_allowed_origins) == 1 && var.api_cors_allowed_origins[0] == "*" ? "'*'" : "method.request.header.Origin"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
   }
 }
