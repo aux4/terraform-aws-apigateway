@@ -244,7 +244,7 @@ resource "aws_api_gateway_rest_api" "api" {
                   }
                   responseTemplates = {
                     "application/json" = <<-EOT
-                      #set($origin = $input.params("Origin"))
+                      #set($origin = $input.params().header.get("Origin"))
                       #set($allowedOrigins = $input.json("$.allowedOrigins"))
                       #set($allowedOrigin = "")
                       #foreach($allowed in $allowedOrigins)
