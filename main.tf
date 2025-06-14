@@ -267,20 +267,8 @@ resource "aws_api_gateway_gateway_response" "api_default_4xx" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   response_type = "DEFAULT_4XX"
   response_parameters = {
-    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = length(var.api_cors_allowed_origins) == 1 && var.api_cors_allowed_origins[0] == "*" ? "'*'" : "method.request.header.Origin"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
-  }
-  response_templates = {
-    "application/json" = <<-EOT
-      #set($domains = ${jsonencode(var.api_cors_allowed_origins)})
-      #set($origin = $input.params("origin"))
-      #if($domains.contains($origin))
-        #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
-      #end
-      {
-        "message": $context.error.messageString
-      }
-    EOT
   }
 }
 
@@ -288,20 +276,8 @@ resource "aws_api_gateway_gateway_response" "api_default_5xx" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   response_type = "DEFAULT_5XX"
   response_parameters = {
-    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = length(var.api_cors_allowed_origins) == 1 && var.api_cors_allowed_origins[0] == "*" ? "'*'" : "method.request.header.Origin"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS'"
-  }
-  response_templates = {
-    "application/json" = <<-EOT
-      #set($domains = ${jsonencode(var.api_cors_allowed_origins)})
-      #set($origin = $input.params("origin"))
-      #if($domains.contains($origin))
-        #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
-      #end
-      {
-        "message": $context.error.messageString
-      }
-    EOT
   }
 }
 
