@@ -168,13 +168,13 @@ resource "aws_api_gateway_rest_api" "api" {
     securityDefinitions = {
       for auth_name, auth in var.api_authorizers : auth_name => {
         type                         = "apiKey"
-        name                         = "Authorization"
-        in                           = "header"
+        name                         = auth.type == "cookie" ? "Cookie" : "Authorization"
+        in                           = auth.type == "cookie" ? "header" : "header"
         x-amazon-apigateway-authtype = "custom"
         x-amazon-apigateway-authorizer = {
           type                         = "request"
-          identitySource               = "method.request.header.Authorization"
-          identityValidationExpression = "Bearer [^\\s]+"
+          identitySource               = auth.type == "cookie" ? "method.request.header.Cookie" : "method.request.header.Authorization"
+          identityValidationExpression = auth.type == "cookie" ? "SID=[^;\\s]+" : "Bearer [^\\s]+"
           authorizerCredentials        = aws_iam_role.api_role.arn
           authorizerUri                = auth.lambda.arn != null ? auth.lambda.arn : module.lambda_authorizer[auth_name].function_invoke_arn
           authorizerResultTtlInSeconds = auth.authorizer_result_ttl_in_seconds

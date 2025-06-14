@@ -35,6 +35,7 @@ variable "api_description" {
 variable "api_authorizers" {
   description = "The authorizers for the API Gateway"
   type        = map(object({
+    type = string # "bearer" or "cookie"
     lambda = object({
       arn                   = optional(string)
       zip                   = optional(string)
@@ -48,6 +49,13 @@ variable "api_authorizers" {
     })
     authorizer_result_ttl_in_seconds = optional(number)
   }))
+  
+  validation {
+    condition = alltrue([
+      for auth in var.api_authorizers : contains(["bearer", "cookie"], auth.type)
+    ])
+    error_message = "Authorizer type must be either 'bearer' or 'cookie'."
+  }
 }
 
 variable "api_paths" {
