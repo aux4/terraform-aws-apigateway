@@ -1,15 +1,14 @@
 terraform {
   required_providers {
     aws = {
-      source                = "hashicorp/aws"
-      version               = "~> 5.0"
-      configuration_aliases = [aws.region]
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
 }
 
 locals {
-  api_name = "${var.env}-${var.api_name}"
+  api_name = "${var.env}-${var.api_name}-${var.region}"
 }
 
 module "lambda_authorizer" {
@@ -77,7 +76,7 @@ resource "aws_lambda_permission" "api_lambda_execution_permission" {
 }
 
 resource "aws_iam_role" "api_role" {
-  name = "${var.env}-${var.api_name}-role"
+  name = "${var.env}-${var.api_name}-${var.region}-role"
 
   assume_role_policy = <<EOF
 {
@@ -318,3 +317,13 @@ resource "aws_api_gateway_stage" "api_stage" {
   }
 }
 
+resource "aws_api_gateway_domain_name" "api_domain" {
+  certificate_arn = var.certificate_arn
+  domain_name     = "${var.region}.${var.env == "prod" ? var.api_domain : "${var.env}.${var.api_domain}"}"
+}
+
+resource "aws_api_gateway_base_path_mapping" "api_base_path_mapping" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
+}

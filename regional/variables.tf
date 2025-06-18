@@ -1,3 +1,8 @@
+variable "region" {
+  description = "The AWS region for this deployment"
+  type        = string
+}
+
 variable "env" {
   description = "The environment"
   type        = string
@@ -5,11 +10,6 @@ variable "env" {
 
 variable "api_domain" {
   description = "The domain of the API Gateway"
-  type        = string
-}
-
-variable "route53_zone_id" {
-  description = "The Route 53 zone ID"
   type        = string
 }
 
@@ -35,7 +35,7 @@ variable "api_description" {
 variable "api_authorizers" {
   description = "The authorizers for the API Gateway"
   type        = map(object({
-    type = string # "bearer" or "cookie"
+    type = string
     lambda = object({
       arn                   = optional(string)
       zip                   = optional(string)
@@ -95,13 +95,7 @@ variable "api_cors_allowed_origins" {
   default     = ["*"]
 }
 
-variable "regions" {
-  description = "List of AWS regions to deploy the API Gateway to for multi-region setup"
-  type        = list(string)
-  default     = []
-  validation {
-    condition     = length(var.regions) > 0
-    error_message = "At least one region must be specified."
-  }
+variable "certificate_arn" {
+  description = "ARN of the ACM certificate for the domain"
+  type        = string
 }
-
