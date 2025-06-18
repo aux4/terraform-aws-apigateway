@@ -243,16 +243,9 @@ resource "aws_api_gateway_rest_api" "api" {
                     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
                   }
                   responseTemplates = {
-                    "application/json" = <<-EOT
-                      #set($domains = ${jsonencode(var.api_cors_allowed_origins)})
-                      #set($origin = $input.params("origin"))
-                      #if($domains.contains($origin))
-                        #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
-                      #end
-                      {
-                        "statusCode": 200
-                      }
-                    EOT
+                    "application/json" = templatefile("${path.module}/templates/options_response.vtl", {
+                      allowed_origins = var.api_cors_allowed_origins
+                    })
                   }
                 }
               }

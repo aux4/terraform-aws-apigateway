@@ -1,0 +1,8 @@
+#set($allowedOrigins = [${join(",", [for origin in allowed_origins : "\"${origin}\""])}])
+#set($origin = $input.params("origin"))
+#if($allowedOrigins.contains($origin))
+  #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+#end
+{
+  "statusCode": 200
+}
