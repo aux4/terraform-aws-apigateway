@@ -96,12 +96,14 @@ variable "api_cors_allowed_origins" {
 }
 
 variable "regions" {
-  description = "List of AWS regions to deploy the API Gateway to for multi-region setup"
+  description = "List of AWS regions to deploy the API Gateway to for multi-region setup (single-region mode)"
   type        = list(string)
   default     = []
-  validation {
-    condition     = length(var.regions) > 0
-    error_message = "At least one region must be specified."
-  }
+}
+
+variable "region_providers" {
+  description = "Map of provider aliases for multi-region deployment. Key is the alias name, value doesn't matter."
+  type        = map(string)
+  default     = {}
 }
 

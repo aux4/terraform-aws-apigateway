@@ -25,17 +25,35 @@ To use the original single-region deployment, use the existing files:
 
 To deploy across multiple regions, use the multi-region files:
 
-```hcl
-# Use main-multi-region.tf as your main.tf
-# Include certificate-multi-region.tf
-# Include route53-multi-region.tf  
-# Include outputs-multi-region.tf
+First, define regional providers in your calling module:
 
+```hcl
+# Define providers for each region you want to deploy to
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias  = "eu_west_1"
+  region = "eu-west-1"
+}
+
+provider "aws" {
+  alias  = "ap_southeast_1"
+  region = "ap-southeast-1"
+}
+
+# Use the multi-region module
 module "api_gateway" {
-  source = "./path/to/this/module"
+  source = "./path/to/this/module"  # Use main-multi-region.tf
   
-  # Multi-region configuration
-  regions = ["us-east-1", "eu-west-1", "ap-southeast-1"]
+  # Pass provider aliases to the module
+  region_providers = {
+    us_east_1      = "us-east-1"
+    eu_west_1      = "eu-west-1"  
+    ap_southeast_1 = "ap-southeast-1"
+  }
   
   # Standard configuration
   env                      = "prod"
