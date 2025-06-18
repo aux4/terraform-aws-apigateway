@@ -1,11 +1,28 @@
-locals {
-  api_name = "${var.env}-${var.api_name}"
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+      configuration_aliases = [
+        aws.us-east-1,
+        aws.us-west-2,
+        aws.eu-west-1,
+        aws.ap-southeast-1,
+      ]
+    }
+  }
 }
 
-provider "aws" {
-  for_each = toset(var.regions)
-  alias    = each.key
-  region   = each.key
+locals {
+  api_name_multi = "${var.env}-${var.api_name}"
+  
+  # Provider mapping for common regions
+  region_providers = {
+    "us-east-1"      = aws.us-east-1
+    "us-west-2"      = aws.us-west-2
+    "eu-west-1"      = aws.eu-west-1
+    "ap-southeast-1" = aws.ap-southeast-1
+  }
 }
 
 module "api_gateway_regional" {
@@ -14,7 +31,7 @@ module "api_gateway_regional" {
   for_each = toset(var.regions)
   
   providers = {
-    aws = aws[each.key]
+    aws = local.region_providers[each.key]
   }
   
   region                    = each.key

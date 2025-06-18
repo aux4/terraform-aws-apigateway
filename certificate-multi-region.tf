@@ -4,7 +4,7 @@ module "certificate_regional" {
   for_each = toset(var.regions)
   
   providers = {
-    aws = aws[each.key]
+    aws = local.region_providers[each.key]
   }
   
   region          = each.key
