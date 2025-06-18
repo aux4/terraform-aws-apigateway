@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 resource "aws_acm_certificate" "api_certificate" {
   domain_name       = "${var.region}.${var.env == "prod" ? var.api_domain : "${var.env}.${var.api_domain}"}"
   validation_method = "DNS"
