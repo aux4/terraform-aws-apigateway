@@ -4,6 +4,9 @@ resource "aws_api_gateway_domain_name" "api_domain" {
 }
 
 resource "aws_route53_record" "api_domain_route" {
+  count    = var.create_route53_record ? 1 : 0
+  provider = aws.static
+  
   name    = aws_api_gateway_domain_name.api_domain.domain_name
   type    = "A"
   zone_id = var.route53_zone_id

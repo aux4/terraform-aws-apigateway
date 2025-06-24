@@ -8,6 +8,12 @@ variable "api_domain" {
   type        = string
 }
 
+variable "create_route53_record" {
+  description = "Whether to create Route53 record for the domain"
+  type        = bool
+  default     = true
+}
+
 variable "route53_zone_id" {
   description = "The Route 53 zone ID"
   type        = string
