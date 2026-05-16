@@ -101,3 +101,15 @@ variable "api_cors_allowed_origins" {
   default     = ["*"]
 }
 
+variable "api_throttle_rate_limit" {
+  description = "The API request steady-state rate limit (requests per second)"
+  type        = number
+  default     = -1
+}
+
+variable "api_throttle_burst_limit" {
+  description = "The API request burst limit (maximum concurrent requests)"
+  type        = number
+  default     = -1
+}
+

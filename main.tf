@@ -240,7 +240,7 @@ resource "aws_api_gateway_rest_api" "api" {
                   responseParameters = {
                     "method.response.header.Access-Control-Allow-Origin"      = "'*'"
                     "method.response.header.Access-Control-Allow-Methods"     = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
-                    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Credentials,Cookie'"
+                    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Credentials,Cookie,If-Match'"
                     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
                   }
                   responseTemplates = {
@@ -315,6 +315,19 @@ resource "aws_api_gateway_stage" "api_stage" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_method_settings" "api_throttle_settings" {
+  count = var.api_throttle_rate_limit >= 0 || var.api_throttle_burst_limit >= 0 ? 1 : 0
+
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    throttling_rate_limit  = var.api_throttle_rate_limit >= 0 ? var.api_throttle_rate_limit : null
+    throttling_burst_limit = var.api_throttle_burst_limit >= 0 ? var.api_throttle_burst_limit : null
   }
 }
 
