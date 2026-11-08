@@ -290,6 +290,12 @@ resource "aws_api_gateway_deployment" "api_deployment" {
 
   rest_api_id = aws_api_gateway_rest_api.api.id
 
+  # Updating the REST definition does not update an existing stage snapshot.
+  # Deploy again whenever routes, integrations, or CORS templates change.
+  triggers = {
+    definition = sha1(aws_api_gateway_rest_api.api.body)
+  }
+
   variables = {
     deployed_at = timestamp()
   }
