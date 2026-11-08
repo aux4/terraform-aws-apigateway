@@ -229,6 +229,10 @@ resource "aws_api_gateway_rest_api" "api" {
             },
             x-amazon-apigateway-integration = {
               type = "mock"
+              # OPTIONS always carries text JSON, including on binary */* APIs.
+              # Without this, live preflights fail binary conversion even when
+              # API Gateway's control-plane test invocation succeeds.
+              contentHandling = "CONVERT_TO_TEXT"
               requestTemplates = {
                 "application/json" = jsonencode({
                   statusCode     = 200
@@ -237,7 +241,8 @@ resource "aws_api_gateway_rest_api" "api" {
               }
               responses = {
                 "default" = {
-                  statusCode = "200"
+                  statusCode      = "200"
+                  contentHandling = "CONVERT_TO_TEXT"
                   responseParameters = {
                     "method.response.header.Access-Control-Allow-Origin"      = "'*'"
                     "method.response.header.Access-Control-Allow-Methods"     = "'${join(",", concat(["OPTIONS"], distinct(flatten([for method, config in methods : upper(method)]))))}'"
