@@ -1,15 +1,15 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source                = "hashicorp/aws"
+      version               = "~> 5.0"
       configuration_aliases = [aws.static]
     }
   }
 }
 
 locals {
-  api_name = "${var.env}-${var.api_name}"
+  api_name              = "${var.env}-${var.api_name}"
   cors_origin_condition = join(" || ", [for origin in var.api_cors_allowed_origins : "$origin == \"${origin}\""])
 }
 
