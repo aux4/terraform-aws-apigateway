@@ -10,6 +10,7 @@ terraform {
 
 locals {
   api_name = "${var.env}-${var.api_name}"
+  cors_origin_condition = join(" || ", [for origin in var.api_cors_allowed_origins : "$origin == \"${origin}\""])
 }
 
 module "lambda_authorizer" {
@@ -245,10 +246,9 @@ resource "aws_api_gateway_rest_api" "api" {
                   }
                   responseTemplates = {
                     "application/json" = <<-EOT
-                      #set($allowedOrigins = [${join(",", [for origin in var.api_cors_allowed_origins : "\"${origin}\""])}])
-                      #set($origin = $input.params("origin"))
-                      #if($allowedOrigins.contains($origin))
-                        #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+                      #set($origin = $input.params().header.get("Origin"))
+                      #if(${local.cors_origin_condition})
+                        #set($context.responseOverride.header['Access-Control-Allow-Origin'] = $origin)
                       #end
                       {
                         "statusCode": 200
