@@ -247,6 +247,9 @@ resource "aws_api_gateway_rest_api" "api" {
                   responseTemplates = {
                     "application/json" = <<-EOT
                       #set($origin = $input.params().header.get("Origin"))
+                      #if(!$origin)
+                        #set($origin = $input.params().header.get("origin"))
+                      #end
                       #if(${local.cors_origin_condition})
                         #set($context.responseOverride.header['Access-Control-Allow-Origin'] = $origin)
                       #end
